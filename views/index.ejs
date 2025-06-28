@@ -1,0 +1,89 @@
+<%- include('partials/header.ejs'); -%>
+
+
+
+
+
+<div class="modal fade" id="customModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-3 shadow">
+      <div class="modal-body p-4 text-center">
+        <h5 id="modalTitle" class="mb-2">Helpbook</h5>
+        <p class="mb-4">1. Create your ToDo Things by adding in New item.
+        </p>
+        <p>2. When your Task is done check it to remove it from list.</p>
+        <p>3. You can also create your own list in sidebar section like for Today, Week etc.</p>
+        <div class="d-flex justify-content-evenly">
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal">Understand</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<div class="container">
+ <div class="sidebar">
+  <% allLists.forEach(list => { %>
+    <a href="/<%=list.toLowerCase()%>" class="nav-btn 
+    <%=listTitle.toLowerCase()===list.toLowerCase()?'active':''%>">
+    <%=list%> 
+  </a>
+  <% }) %>
+ <form action="/newList" method="post">
+  <input type="text" name="newList" placeholder="Add Occasion" required>
+  <button class="nav-btn add-btn" type="submit">+ New List</button>
+ </form>
+ </div>
+
+ <div class="main-content">
+ <div class="box" id="heading">
+  <h1><%= listTitle %></h1>
+ </div>
+
+  <div class="box">
+    <% for(let item of listItems){%>
+      <div class="item">
+        <form action="/delete" method="post">
+               <input type="hidden" name="list" value="<%=listTitle%>">
+          <input type="checkbox" onchange="this.form.submit()" name="deleteItemId" value="<%= item.id %>">
+        </form>
+
+        <p id="title<%=item.id%>">
+          <%= item.title %>
+        </p>
+
+        <form class="edit" action="/edit" method="post">
+          <input type="hidden" name="updatedItemId" value="<%= item.id %>">
+          <input type="hidden" name="list" value="<%=listTitle%>">
+          <input id="input<%=item.id%>" type="text" name="updatedItemTitle" value="<%= item.title %>" autocomplete="off"
+            autofocus="true" hidden="true" />
+          <button id="done<%=item.id%>" class="edit" type="submit" hidden><img class="icon"
+              src="/assets/icons/check-solid.svg" alt="tick image"></button>
+        </form>
+        <button id="edit<%=item.id%>" class="edit" onclick="handler('<%=item.id%>')"><img class="icon"
+            src="/assets/icons/pencil-solid.svg" alt="pencil image"></button>
+      </div>
+      <% } %>
+
+        <form class="item" action="/add" method="post">
+               <input type="hidden" name="list" value="<%=listTitle%>">
+          <input type="text" name="newItem" placeholder="New Item" autocomplete="off" autofocus="true" />
+          <button class="add1" type="submit">+</button>
+        </form>
+    </div>
+  </div>
+</div>
+
+  <script>
+    function handler(id) {
+      document.getElementById("title" + id).setAttribute("hidden", true)
+      document.getElementById("edit" + id).setAttribute("hidden", true)
+      document.getElementById("done" + id).removeAttribute("hidden")
+      document.getElementById("input" + id).removeAttribute("hidden")
+    }
+  </script>
+  <%- include('partials/footer.ejs'); -%>
